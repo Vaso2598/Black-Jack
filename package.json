@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "pixi-filters": "^6.1.0",
+    "pixi.js": "^8.8.1",
+    "vite": "^6.2.0"
+  }
+}
