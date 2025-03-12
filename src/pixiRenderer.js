@@ -18,12 +18,15 @@ export class PixiRenderer {
 		this.app = new PIXI.Application();
 		this.assetLoader = new AssetLoader();
 		this.gameSarted = false;
+		this.playerScoreText = null;
+		this.dealerScoreText = null;
+		this.cardsInPlay = [];
 	}
 
 	async init() {
 		await this.app.init({
-			width: 800,
-			height: 600,
+			width: window.innerWidth,
+			height: window.innerHeight,
 			background: 0x228b22,
 			resolution: window.devicePixelRatio || 1,
 			autoDensity: true,
@@ -31,6 +34,12 @@ export class PixiRenderer {
 
 		document.getElementById("game").appendChild(this.app.canvas);
 		await this.assetLoader.init();
+
+		window.addEventListener("resize", this.onResize.bind(this));
+	}
+
+	onResize() {
+		this.app.renderer.resize(window.innerWidth, window.innerHeight);
 	}
 
 	addCardFaceUp(cardName, x = 0, y = 0) {
@@ -39,13 +48,23 @@ export class PixiRenderer {
 		if (!cardTexture) {
 			console.error(`❌ ${cardName} texture not found`);
 		}
-		const card = new PIXI.Sprite(cardTexture);
-		card.filters = [cardShadowFilter];
-		console.log(card);
+		this.card = new PIXI.Sprite(cardTexture);
+		this.card.anchor.set(0.5, 0);
+		this.card.filters = [cardShadowFilter];
+		// console.log(card);
 
-		card.position.set(x, y);
+		this.card.position.set(x, y);
 
-		this.app.stage.addChild(card);
+		this.app.stage.addChild(this.card);
+
+		this.cardsInPlay.push(this.card);
+	}
+
+	removePlayedCards() {
+		for (const card of this.cardsInPlay) {
+			this.app.stage.removeChild(card);
+		}
+		this.cardsInPlay = [];
 	}
 
 	createDeck() {
@@ -62,11 +81,11 @@ export class PixiRenderer {
 			deckContainer.addChild(sprite);
 		}
 
-		deckContainer.position.set(750 - 96, 50);
+		deckContainer.position.set(window.innerWidth - 96 * 2, 128 / 2);
 		console.log(deckContainer.children.length);
 	}
 
-	removeCard() {
+	removeCardFromDeck() {
 		const deckContainer = this.app.stage.children.find((child) => child instanceof PIXI.Container);
 
 		if (deckContainer && deckContainer.children.length > 0) {
@@ -77,6 +96,35 @@ export class PixiRenderer {
 		} else {
 			console.error("No cards left in the deck to remove");
 			return null;
+		}
+	}
+
+	updatePlayerScore(score, x = 0, y = 0) {
+		if (this.playerScoreText) {
+			this.app.stage.removeChild(this.playerScoreText);
+		}
+		this.playerScoreText = new PIXI.Text({text: `${score}`});
+		this.playerScoreText.position.set(x, y);
+		this.app.stage.addChild(this.playerScoreText);
+	}
+
+	updateDealerScore(score, x = 0, y = 0) {
+		if (this.dealerScoreText) {
+			this.app.stage.removeChild(this.dealerScoreText);
+		}
+		this.dealerScoreText = new PIXI.Text({text: `${score}`});
+		this.dealerScoreText.position.set(x, y);
+		this.app.stage.addChild(this.dealerScoreText);
+	}
+
+	removeAllScoreText() {
+		if (this.playerScoreText) {
+			this.app.stage.removeChild(this.playerScoreText);
+			this.playerScoreText = null;
+		}
+		if (this.dealerScoreText) {
+			this.app.stage.removeChild(this.dealerScoreText);
+			this.dealerScoreText = null;
 		}
 	}
 }
