@@ -13,7 +13,24 @@ let playerHandIndex = player1.hand.length - 1;
 let dealerHandIndex = dealer.hand.length - 1;
 
 const startGame = document.getElementById("start");
+const hit = document.getElementById("hit");
+const stand = document.getElementById("stand");
+
+if (renderer.gameSarted === false) {
+	hit.setAttribute("disabled", true);
+	stand.setAttribute("disabled", true);
+}
+
+/* Betting Chips */
+
+/* Start Game Button */
 startGame.addEventListener("click", () => {
+	renderer.gameSarted = true;
+
+	startGame.setAttribute("disabled", true);
+	hit.removeAttribute("disabled");
+	stand.removeAttribute("disabled");
+
 	playerCardCoordinateX = 0;
 	dealerCardCoordinateX = 0;
 
@@ -21,21 +38,15 @@ startGame.addEventListener("click", () => {
 	dealerHandIndex = -1;
 
 	renderer.removeAllScoreText();
-	renderer.removeCardFromDeck();
 	player1.hand = [];
 	dealer.hand = [];
 	player1.score = 0;
 	dealer.score = 0;
-	/* 	for (let i = 0; i < 2; i++) {
-		player1.recieveCard(deck1.draw());
-		renderer.addCardFaceUp(player1.hand[i].image, window.innerWidth / 2 - (i * 96) / 4, window.innerHeight - 128 * 2);
-		
-		dealer.recieveCard(deck1.draw());
-		renderer.addCardFaceUp(dealer.hand[i].image, window.innerWidth / 2 - (i * 96) / 4, 128 / 2);
-		renderer.removeCardFromDeck();
-		} */
+
+	// Draw 2 cards for player
 	playerHandIndex++;
 	player1.recieveCard(deck1.draw());
+	renderer.removeCardFromDeck();
 	renderer.addCardFaceUp(
 		player1.hand[playerHandIndex].image,
 		window.innerWidth / 2 + playerCardCoordinateX,
@@ -45,36 +56,46 @@ startGame.addEventListener("click", () => {
 	playerCardCoordinateX += 24;
 	playerHandIndex++;
 	player1.recieveCard(deck1.draw());
+	renderer.removeCardFromDeck();
 	renderer.addCardFaceUp(
 		player1.hand[playerHandIndex].image,
 		window.innerWidth / 2 + playerCardCoordinateX,
 		window.innerHeight - 128 * 2
 	);
 
+	// Draw 2 cards for dealer
 	dealerHandIndex++;
 	dealer.recieveCard(deck1.draw());
+	renderer.removeCardFromDeck();
 	renderer.addCardFaceUp(dealer.hand[dealerHandIndex].image, window.innerWidth / 2 + dealerCardCoordinateX, 128 / 2);
 
 	dealerCardCoordinateX += 24;
-	dealerHandIndex++;
-	dealer.recieveCard(deck1.draw());
-	renderer.addCardFaceUp(dealer.hand[dealerHandIndex].image, window.innerWidth / 2 + dealerCardCoordinateX, 128 / 2);
+	// dealerHandIndex++;
+	// dealer.recieveCard(deck1.draw());
+	renderer.removeCardFromDeck();
+	// renderer.addCardFaceUp(dealer.hand[dealerHandIndex].image, window.innerWidth / 2 + dealerCardCoordinateX, 128 / 2);
+	renderer.addCardFaceUp("Card_Back", window.innerWidth / 2 + dealerCardCoordinateX, 128 / 2);
 
 	renderer.updatePlayerScore(player1.score, window.innerWidth / 2, window.innerHeight - 128 * 2.4);
 	renderer.updateDealerScore(dealer.score, window.innerWidth / 2, 128 * 1.6);
 	if (player1.score === 21) {
+		renderer.updateWinAndLoseMessage("Player got Black-Jack!", window.innerWidth / 2, window.innerHeight / 2);
 		console.log("Player got Black-Jack!");
 		setTimeout(() => {
 			renderer.removePlayedCards();
 			renderer.removeAllScoreText();
-		}, 2000);
+			startGame.removeAttribute("disabled");
+			hit.setAttribute("disabled", true);
+			stand.setAttribute("disabled", true);
+		}, 5000);
 	}
 	console.log(player1);
 	console.log(dealer);
-	console.log(renderer.cardsInPlay);
+	// console.log(renderer.cardsInPlay);
+	console.log("dealerHandIndex on start game is: ", dealerHandIndex);
 });
 
-const hit = document.getElementById("hit");
+/* Hit Button */
 hit.addEventListener("click", () => {
 	player1.recieveCard(deck1.draw());
 	playerCardCoordinateX += 24;
@@ -87,56 +108,68 @@ hit.addEventListener("click", () => {
 	);
 	renderer.removeCardFromDeck();
 	if (player1.score > 21) {
-		console.log("Player Bust");
+		renderer.updateWinAndLoseMessage("Player Lost", window.innerWidth / 2, window.innerHeight / 2);
+		console.log("Player Lost");
 		setTimeout(() => {
 			renderer.removePlayedCards();
 			renderer.removeAllScoreText();
-		}, 2000);
-	} else if (player1.score === 21) {
-		console.log("Player Won");
+			startGame.removeAttribute("disabled");
+			hit.setAttribute("disabled", true);
+			stand.setAttribute("disabled", true);
+		}, 5000);
 	}
 	renderer.updatePlayerScore(player1.score, window.innerWidth / 2, window.innerHeight - 128 * 2.4);
 	renderer.updateDealerScore(dealer.score, window.innerWidth / 2, 128 * 1.6);
 });
 
-const stand = document.getElementById("stand");
+/* Stand Button */
 stand.addEventListener("click", () => {
-	dealerCardCoordinateX += 24;
-	console.log(dealerHandIndex);
-	dealerHandIndex++;
-	console.log(dealerHandIndex);
-	dealer.dealerLogic(deck1.draw());
-	// renderer.addCardFaceUp(dealer.hand[dealerHandIndex].image, window.innerWidth / 2 + dealerCardCoordinateX, 128 / 2);
-
-	if (dealer.score > 21) {
-		console.log("Dealer Bust");
-	} else if (dealer.score === 21) {
-		console.log("Dealers Won");
+	dealerCardCoordinateX = 0;
+	while (dealer.score < 17) {
+		dealerHandIndex++;
+		dealerCardCoordinateX += 24;
+		dealer.recieveCard(deck1.draw());
+		renderer.addCardFaceUp(dealer.hand[dealerHandIndex].image, window.innerWidth / 2 + dealerCardCoordinateX, 128 / 2);
+		renderer.removeCardFromDeck();
 	}
-	renderer.updatePlayerScore(player1.score, window.innerWidth / 2, window.innerHeight - 128 * 2.4);
+
 	renderer.updateDealerScore(dealer.score, window.innerWidth / 2, 128 * 1.6);
 	console.log(dealer);
 	if ((player1.score > dealer.score && player1.score <= 21) || dealer.score > 21) {
+		renderer.updateWinAndLoseMessage("Player Wins", window.innerWidth / 2, window.innerHeight / 2);
 		console.log("Player Wins");
 		setTimeout(() => {
 			renderer.removePlayedCards();
 			renderer.removeAllScoreText();
-		}, 2000);
+			startGame.removeAttribute("disabled");
+			hit.setAttribute("disabled", true);
+			stand.setAttribute("disabled", true);
+		}, 5000);
 	} else if ((player1.score < dealer.score && dealer.score <= 21) || player1.score > 21) {
+		renderer.updateWinAndLoseMessage("Dealer Wins", window.innerWidth / 2, window.innerHeight / 2);
 		console.log("Dealer Wins");
 		setTimeout(() => {
 			renderer.removePlayedCards();
 			renderer.removeAllScoreText();
-		}, 2000);
+			startGame.removeAttribute("disabled");
+			hit.setAttribute("disabled", true);
+			stand.setAttribute("disabled", true);
+		}, 5000);
 	} else {
+		renderer.updateWinAndLoseMessage("It's a tie", window.innerWidth / 2, window.innerHeight / 2);
 		console.log("It's a tie");
 		setTimeout(() => {
 			renderer.removePlayedCards();
 			renderer.removeAllScoreText();
-		}, 2000);
+			startGame.removeAttribute("disabled");
+			hit.setAttribute("disabled", true);
+			stand.setAttribute("disabled", true);
+		}, 5000);
 	}
 });
 
 await renderer.init();
 
 renderer.createDeck();
+
+renderer.addChips();

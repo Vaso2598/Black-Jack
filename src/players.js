@@ -27,11 +27,11 @@ export class Player {
 		}
 	}
 
-	dealerLogic(card) {
-		while (this.score < 17) {
-			this.recieveCard(card);
-		}
-	}
+	// dealerLogic(card) {
+	// 	while (this.score < 17) {
+	// 		this.recieveCard(card);
+	// 	}
+	// }
 
 	resetHandandScore() {
 		this.hand = [];

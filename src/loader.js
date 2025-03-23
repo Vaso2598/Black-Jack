@@ -1,5 +1,4 @@
 import * as PIXI from "pixi.js";
-// import {Deck} from "./deck";
 
 export class AssetLoader {
 	constructor() {
@@ -13,30 +12,11 @@ export class AssetLoader {
 	}
 
 	async loadTextures() {
-		// const suits = new Deck().suits;
-		// const values = new Deck().values;
-
-		// for (const suit of suits) {
-		// 	for (const value of values) {
-		// 		const cardName = `${value}_of_${suit}`;
-		// 		// console.log(`Attempt to load ${cardName}`);
-		// 		try {
-		// 			this.textures[cardName] = await PIXI.Assets.load(`./sprites/${suit}/${value}.png`);
-		// 			// console.log(`Loaded: ${cardName}`);
-		// 		} catch (error) {
-		// 			console.error(`❌ Failed to load: ${cardName}`, error);
-		// 		}
-		// 	}
-		// }
-
-		// try {
-		// 	this.textures["Card_Back"] = await PIXI.Assets.load("./sprites/card_back.png");
-		// 	// console.log("Loaded: Card Back");
-		// } catch (error) {
-		// 	console.error("❌ Failed to load: Card_Back", error);
-		// }
-		// // console.log("✅ All textures loaded:", Object.keys(this.textures));
 		this.textures = {
+			// Chips SpriteSheet
+			Chips: await PIXI.Assets.load("./sprites/chips.png"),
+
+			// Card Back
 			Card_Back: await PIXI.Assets.load("./sprites/card_back.png"),
 
 			// Hearts
