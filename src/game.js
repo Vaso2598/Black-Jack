@@ -1,5 +1,6 @@
 import {Deck} from "./deck.js";
 import {Player} from "./players.js";
+import {Button} from "./buttons.js";
 import {PixiRenderer} from "./pixiRenderer.js";
 
 const deck1 = new Deck();
@@ -22,6 +23,8 @@ if (renderer.gameSarted === false) {
 }
 
 /* Betting Chips */
+// const chipContainer = new PIXI.Container();
+// this.app.stage.addChild(chipContainer);
 
 /* Start Game Button */
 startGame.addEventListener("click", () => {
@@ -172,4 +175,4 @@ await renderer.init();
 
 renderer.createDeck();
 
-renderer.addChips();
+// renderer.addChips();
